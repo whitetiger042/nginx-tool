@@ -1,0 +1,48 @@
+server {
+    listen [::]:{{ DEFAULT_PORT }} default_server ipv6only=on;
+    listen {{ ALLOW_ALL_IPV4 }}:{{ DEFAULT_PORT }} default_server;
+    server_name _;
+    root /var/www/;
+    location / {
+        return 503;
+    }
+}
+upstream acceptance {
+    server 127.0.0.1:{{ APP_ACCEPTANCE_RUNTIME_PORT }};
+}
+server {
+    listen [::]:{{ DEFAULT_PORT }};
+    listen {{ ALLOW_ALL_IPV4 }}:{{ SERVER_PORT}};
+    server_name {{APP_ACCEPTANCE_FQDN_0}};
+    server_name {{ APP_ACCEPTANCE_FQDN_1 }};
+    location / {
+        proxy_pass http://acceptance;
+    }
+    location /public {
+        proxy_pass http://acceptance;
+        allow {{ ALLOW_ALL_IPV4 }};
+        allow {{ ALLOW_ALL_IPV6 }};
+        deny all;
+    }
+    allow {{ IPV4_CIDR_00 }};
+    allow {{ IPV6_CIDR_01 }};
+    deny all;
+}
+upstream production {
+    server 127.0.0.1:{{ PROD_RUNTIME_PORT }};
+}
+server {
+    listen [::]:{{ DEFAULT_PORT }};
+    listen 0.0.0.0:{{ DEFAULT_PORT }};
+    server_name {{ APP_PRODUCTION_FQDN_0 }};
+    server_name {{ APP_PRODUCTION_FQDN_1 }};
+    location / {
+        proxy_pass http://production;
+    }
+    location /secret {
+        proxy_pass http://production;
+        allow {{ IPV4_CIDR_00 }};
+        allow {{ IPV6_CIDR_01 }};
+        deny all;
+    }
+}
