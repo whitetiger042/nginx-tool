@@ -71,8 +71,7 @@ nginx_variables = {
     'APP_PRODUCTION_FQDN_0': os.environ.get('APP_PRODUCTION_FQDN_0'),
     'APP_PRODUCTION_FQDN_1': os.environ.get('APP_PRODUCTION_FQDN_1'),
     'PROD_RUNTIME_PORT': os.environ.get('APP_PRODUCTION_RUNTIME_PORT')
-   # Add more variables as needed...
+
 }
-# Replace 'nginx_template.j2' with the path to your Jinja2 template
-# Replace 'nginx.conf' with the desired output path
+
 render_nginx_template('nginx_template.j2', 'nginx.conf', nginx_variables)
